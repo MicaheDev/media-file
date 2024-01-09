@@ -1,7 +1,7 @@
 <div class="pattern">
   <div class="container">
     <div class="file-container">
-      <form class="form-container">
+      <form class="form-container" (submit)="uploadFile($event)">
         <div class="file-header">
           <svg
             fill="#fff"
@@ -16,7 +16,7 @@
           </svg>
           <h4 class="file-title">Sube un archivo para transcribirlo</h4>
         </div>
-  
+
         <div class="file-content">
           <label class="label">
             <input
@@ -27,10 +27,28 @@
             />
             <span>Select a file</span>
           </label>
-          <p class="file-name">{{ selectedFile }}</p>
-          <button class="button" type="submit">Subir</button>
+          <p class="file-name">{{ fileNameToShow }}</p>
+          <button
+            class="button"
+            [disabled]="(!token && !uploadUrl) || isLoading"
+            [ngClass]="(!token && !uploadUrl) || isLoading ? 'disabled' : ''"
+            type="submit"
+          >
+            {{ isLoading ? "Subiendo..." : "Subir" }}
+          </button>
         </div>
       </form>
     </div>
   </div>
+</div>
+
+<div
+  class="alert"
+  *ngIf="notification.isShow"
+  [ngClass]="notification.type === 'success' ? 'green' : 'red'"
+>
+  <span>{{ notification.message }}</span>
+  <button class="close-button" (click)="closeAlert()">
+    <i class="fas fa-times fs-4 icon"></i>
+  </button>
 </div>

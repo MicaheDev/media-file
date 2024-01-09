@@ -20,8 +20,10 @@
     "@angular/platform-browser": "^16.2.0",
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
+    "ngx-build-plus": "^16.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "uuid": "^9.0.1",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {
@@ -29,6 +31,8 @@
     "@angular/cli": "^16.2.10",
     "@angular/compiler-cli": "^16.2.0",
     "@types/jasmine": "~4.3.0",
+    "@types/uuid": "^9.0.7",
+    "http-proxy-middleware": "^2.0.6",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
