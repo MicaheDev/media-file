@@ -5,7 +5,7 @@ const concat = require("concat");
 
 build = async () => {
   const files = [
-    "./dist/media-file/scripts.js",
+    //"./dist/media-file/scripts.js",
     "./dist/media-file/polyfills.js",
     "./dist/media-file/main.js",
   ];
