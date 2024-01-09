@@ -43,7 +43,7 @@ export class FileUploaderComponent implements OnInit {
 
       this.http
         .post(
-          'https://ubiqq-upload-to-blob-url.azurewebsites.net/api/blobupload',
+          'https://ubiqq-upload-files.azurewebsites.net/api/blobupload',
           {
             container: 'ubiqq',
             blobName: this.selectedFile,
@@ -51,8 +51,8 @@ export class FileUploaderComponent implements OnInit {
         )
         .subscribe(
           (response: any) => {
-            this.uploadUrl = response.uri;
-            this.token = response.token;
+            this.uploadUrl = response.response.uri;
+            this.token = response.response.token;
             this.showNotification('success', 'Archivo con formato correcto');
 
             console.log(this.uploadUrl, this.token);
