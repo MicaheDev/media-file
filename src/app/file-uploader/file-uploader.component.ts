@@ -26,57 +26,58 @@ export class FileUploaderComponent implements OnInit {
     message: '',
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(public http: HttpClient) {}
 
   ngOnInit(): void {}
+
+  generateFileName(file: File): string {
+    const fileId = uuidv4();
+    return `${file.name}_${fileId}`;
+  }
 
   readInputFile($event: any) {
     const files = $event.target.files;
     if (files && files.length > 0) {
       this.fileToUpload = files[0];
       this.fileNameToShow = files[0].name;
-      // Genera un ID único y añádelo al nombre del archivo
-      const fileId = uuidv4();
-      const fileName = `${files[0].name}_${fileId}`;
 
-      this.selectedFile = fileName;
+      this.selectedFile = this.generateFileName(files[0]);
 
-      this.http
-        .post(
-          'https://ubiqq-upload-files.azurewebsites.net/api/blobupload',
-          {
-            container: 'ubiqq',
-            blobName: this.selectedFile,
-          }
-        )
-        .subscribe(
-          (response: any) => {
-            this.uploadUrl = response.response.uri;
-            this.token = response.response.token;
-            this.showNotification('success', 'Archivo con formato correcto');
-
-            console.log(this.uploadUrl, this.token);
-          },
-          (error: any) => {
-            this.showNotification(
-              'warning',
-              'Ha ocurrido un error, intentelo de nuevo'
-            );
-            console.log('Error en la petición:', error);
-            // Si hay información detallada en el error, puedes acceder a ella aquí
-          }
-        );
+      this.getStorageData();
     }
   }
 
-  uploadFile($event: any) {
-    this.isLoading = true;
+  handleError(type: string, errorMessage: string) {
+    this.showNotification(type, errorMessage);
+    console.error(`Error: ${errorMessage}`);
+    this.isLoading = false;
+  }
 
-    $event.preventDefault();
+  getStorageData() {
+    this.http
+      .post('https://ubiqq-upload-files.azurewebsites.net/api/blobupload', {
+        container: 'ubiqq',
+        blobName: this.selectedFile,
+      })
+      .subscribe(
+        (response: any) => {
+          this.uploadUrl = response.response.uri;
+          this.token = response.response.token;
+          this.showNotification('success', 'Archivo con formato correcto');
+
+          console.log(this.uploadUrl, this.token);
+        },
+        (error: any) => {
+          this.handleError(
+            'warning',
+            'Ha ocurrido un error, intentelo de nuevo'
+          );
+        }
+      );
+  }
+
+  sendFile(formData: any) {
     if (this.fileToUpload && this.token && this.uploadUrl) {
-      const formData: FormData = new FormData();
-      formData.append('file', this.fileToUpload, this.fileToUpload.name);
-
       const headers = new HttpHeaders({
         token: this.token, // Reemplaza 'tu_token' con el token real
         'x-ms-blob-type': 'BlockBlob',
@@ -93,15 +94,24 @@ export class FileUploaderComponent implements OnInit {
           this.uploadUrl = null;
         },
         (error) => {
-          console.error('Error al subir el archivo:', error);
-          this.showNotification(
+          this.handleError(
             'warning',
             'Ha ocurrido un error al enviar el archivo, intentelo de nuevo'
           );
-
-          this.isLoading = false;
         }
       );
+    }
+  }
+
+  uploadFile($event: any) {
+    this.isLoading = true;
+
+    $event.preventDefault();
+    if (this.fileToUpload && this.token && this.uploadUrl) {
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+
+      this.sendFile(formData);
     } else {
       console.warn('No se ha seleccionado ningún archivo.');
     }
